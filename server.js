@@ -24,7 +24,7 @@ connectDB().then((response)=> response);
 app.use(express.urlencoded({ extended: false }))
 app.use(cors({
   credentials: true,
-  origin: process.env.CORS_ORIGIN
+  origin: process.env.CORS_ORIGIN.split(',')
 }));
 app.use(express.json())
 app.use(morgan('tiny'))

@@ -3,7 +3,7 @@ const router = express.Router();
 const WishSchema = require('../models/wish');
 const axios = require('axios');
 const {ai21RequestBodyData} =  require('../utils/request');
-const {newYearPrompt, christmasPrompt} = require('../utils/prompts');
+const {newYearPrompt, christmasPrompt, valentinesPrompt} = require('../utils/prompts');
 
 router.post('/new-year', async (req, res) => {
   const data = req.body;
@@ -33,11 +33,11 @@ router.post('/new-year', async (req, res) => {
   }
 });
 
-router.post('/christmas', async (req, res) => {
+router.post('/valentines', async (req, res) => {
   const data = req.body;
   const {recipientName, senderName} = data;
   try {
-    const prompt = christmasPrompt(recipientName, senderName);
+    const prompt = valentinesPrompt(senderName, recipientName);
     const response = await axios.post(process.env.AI21_URI,ai21RequestBodyData(prompt), {
       headers: {
         'Authorization': 'Bearer ' + process.env.AI21_API_KEY,
@@ -53,6 +53,27 @@ router.post('/christmas', async (req, res) => {
     })
     await wish.save()
     res.status(200).json({message: generatedWish})
+  } catch (e) {
+    console.log(e)
+    res.status(500).json({
+      message: 'Something went wrong',
+    });
+  }
+});
+
+
+
+router.get('/stats', async (req, res) => {
+  try {
+    const stats = await WishSchema.aggregate([
+      {
+        $group: {
+          _id: "$senderName",
+          count: { $sum: 1 }
+        }
+      }
+    ])
+    res.status(200).json({message: stats})
   } catch (e) {
     console.log(e)
     res.status(500).json({

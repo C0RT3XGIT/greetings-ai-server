@@ -10,4 +10,4 @@ const WishSchema = new Schema ({
 })
 
 
-module.exports = mongoose.model('GeneratedWishes', WishSchema)
+module.exports = mongoose.model('valentinesWishes', WishSchema)
